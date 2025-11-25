@@ -1,0 +1,101 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f8;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+h1 { color: #333; margin: 0; font-size: 22px; }
+
+.form-group { margin-bottom: 15px; }
+label { display: block; font-weight: 600; margin-bottom: 5px; color: #555; font-size: 14px; }
+
+select, input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.hidden { display: none; }
+
+/* Slots Grid */
+.slots-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.slot {
+    padding: 10px 5px;
+    background: white;
+    border: 1px solid #28a745;
+    color: #28a745;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.slot:hover { background: #28a745; color: white; }
+.slot.selected { background: #2c3e50; color: white; border-color: #2c3e50; }
+
+.slot.booked {
+    background: #ffebee;
+    color: #c0392b;
+    border-color: #e57373;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Buttons */
+.primary-btn {
+    background: #333;
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.whatsapp-btn {
+    display: block;
+    background: #25D366;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 15px;
+}
+.whatsapp-btn:hover { background: #1ebe57; }
+
+.success-box { text-align: center; padding: 20px 0; }
+.text-btn { background: none; border: none; color: #777; margin-top: 15px; cursor: pointer; text-decoration: underline; }
+
+.dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+.dot.busy { background-color: #e74c3c; }
+.dot.free { background-color: #28a745; }
+.note { font-size: 12px; color: #777; margin-top: 8px; }

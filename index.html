@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Booking Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✂️ Smart Salon</h1>
+            <p id="loading-text"><i class="fas fa-spinner fa-spin"></i> Loading Data...</p>
+        </header>
+
+        <div id="app-content" class="hidden">
+            
+            <!-- Step 1: Service -->
+            <div id="step-1" class="form-group">
+                <label>1. Select Service</label>
+                <select id="serviceSelect">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+
+            <!-- Step 2: Barber -->
+            <div id="step-2" class="form-group hidden">
+                <label>2. Select Barber</label>
+                <select id="barberSelect"></select>
+            </div>
+
+            <!-- Step 3: Date & Slots -->
+            <div id="step-3" class="form-group hidden">
+                <label>3. Select Date</label>
+                <input type="date" id="dateInput">
+                
+                <label>4. Available Slots</label>
+                <div id="slotsGrid" class="slots-container"></div>
+                <p class="note"><span class="dot busy"></span> Busy/Overlap <span class="dot free"></span> Available</p>
+            </div>
+
+            <!-- Step 4: Details Form -->
+            <div id="confirm-section" class="hidden">
+                <label>5. Enter Details</label>
+                <input type="text" id="customerName" placeholder="Your Name">
+                <input type="tel" id="customerPhone" placeholder="WhatsApp Number (e.g. 9198xxxxxx)">
+                
+                <button id="saveBtn" class="primary-btn">
+                    Confirm Booking
+                </button>
+            </div>
+
+            <!-- Step 5: Success & WhatsApp (New Section) -->
+            <div id="success-section" class="hidden success-box">
+                <i class="fas fa-check-circle" style="font-size: 50px; color: #2ecc71;"></i>
+                <h3>Booking Saved!</h3>
+                <p>Please click below to send the details to the barber via WhatsApp.</p>
+                
+                <a id="waLink" href="#" target="_blank" class="whatsapp-btn">
+                    <i class="fab fa-whatsapp"></i> Open WhatsApp
+                </a>
+                
+                <button onclick="location.reload()" class="text-btn">Book Another</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
