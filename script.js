@@ -1,11 +1,12 @@
 // --- CONFIGURATION ---
-// പുതിയ Google Script Web App URL ഇവിടെ നൽകുക
+// നിലവിലെ Google Script Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbyZj30SPovjsZhY7ZQMDXROIj_2GwL0D0hP6VGiZpXEZEWEH5ngVI_sc8LHSCzbdgE/exec"; 
 
 let allServices = [], allBarbers = [], allBookings = [];
 let selectedService = null, selectedBarber = null, selectedTime = null;
 
 // --- INITIALIZATION ---
+// പേജ് ലോഡ് ആകുമ്പോൾ പ്രവർത്തിക്കുന്ന കോഡ്
 window.onload = async () => {
     try {
         const res = await fetch(API_URL);
@@ -15,17 +16,21 @@ window.onload = async () => {
         allBarbers = data.barbers;
         allBookings = data.bookings;
 
+        // ലോഡിംഗ് ടെക്സ്റ്റ് മാറ്റി കണ്ടന്റ് കാണിക്കുന്നു
         document.getElementById('loading-text').style.display = 'none';
         document.getElementById('app-content').classList.remove('hidden');
         populateServices();
     } catch (err) {
         alert("ഡാറ്റ ലോഡ് ചെയ്യാൻ സാധിച്ചില്ല. ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.");
         console.error(err);
+        document.getElementById('loading-text').textContent = "Error loading data. Please refresh.";
     }
 };
 
+// സേവനങ്ങൾ (Services) ലിസ്റ്റ് ചെയ്യുന്നു
 function populateServices() {
     const select = document.getElementById('serviceSelect');
+    select.innerHTML = '<option value="">-- Choose Service --</option>'; // Clear default
     allServices.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.id;
@@ -35,16 +40,16 @@ function populateServices() {
 
     select.addEventListener('change', (e) => {
         selectedService = allServices.find(s => s.id == e.target.value);
-        loadBarbers();
+        if(selectedService) loadBarbers();
     });
 }
 
+// ബാർബർമാരെ (Barbers) ലിസ്റ്റ് ചെയ്യുന്നു
 function loadBarbers() {
-    if (!selectedService) return;
     const select = document.getElementById('barberSelect');
     select.innerHTML = '<option value="">-- Choose Barber --</option>';
     
-    // Skills Filtering
+    // Skills അനുസരിച്ച് ബാർബർമാരെ ഫിൽറ്റർ ചെയ്യുന്നു
     const skilledBarbers = allBarbers.filter(b => {
         const skills = String(b.skills).split(',').map(s => s.trim());
         return skills.includes(String(selectedService.id));
@@ -57,23 +62,33 @@ function loadBarbers() {
         select.appendChild(opt);
     });
 
-    document.getElementById('step-2').classList.remove('hidden');
+    const step2 = document.getElementById('step-2');
+    step2.classList.remove('hidden');
+    step2.scrollIntoView({behavior: "smooth"});
     
-    select.addEventListener('change', (e) => {
+    // പഴയ ഇവന്റ് ലിസണർ ഒഴിവാക്കാൻ ക്ലോൺ ചെയ്യുന്നു
+    const newSelect = select.cloneNode(true);
+    select.parentNode.replaceChild(newSelect, select);
+
+    newSelect.addEventListener('change', (e) => {
         selectedBarber = allBarbers.find(b => b.id == e.target.value);
-        document.getElementById('step-3').classList.remove('hidden');
-        
-        // Reset Date Picker
-        const dateInput = document.getElementById('dateInput');
-        dateInput.valueAsDate = new Date();
-        dateInput.min = new Date().toISOString().split('T')[0];
-        dateInput.onchange = generateSlots;
-        generateSlots();
+        if(selectedBarber) {
+            document.getElementById('step-3').classList.remove('hidden');
+            
+            // Reset Date Picker
+            const dateInput = document.getElementById('dateInput');
+            dateInput.valueAsDate = new Date();
+            dateInput.min = new Date().toISOString().split('T')[0];
+            dateInput.onchange = generateSlots;
+            generateSlots(); // Auto generate for today
+            
+            setTimeout(() => document.getElementById('step-3').scrollIntoView({behavior: "smooth"}), 100);
+        }
     });
 }
 
 // ---------------------------------------------------------
-// 🔥 FIX 1: DURATION & OVERLAP CHECK
+// സമയക്രമം (Slots) ഉണ്ടാക്കുന്നു
 // ---------------------------------------------------------
 function generateSlots() {
     const date = document.getElementById('dateInput').value;
@@ -84,13 +99,13 @@ function generateSlots() {
 
     if (!selectedBarber || !date) return;
 
-    // Filter bookings for this barber & date
+    // ബാർബറുടെ ആ ദിവസത്തെ ബുക്കിംഗുകൾ എടുക്കുന്നു
     const barberBookings = allBookings.filter(b => 
         String(b.barber_id) === String(selectedBarber.id) && 
-        String(b.date) === date // Direct string comparison works due to getDisplayValues()
+        String(b.date) === date 
     );
 
-    // Generate 9:00 to 20:00
+    // രാവിലെ 9:00 മുതൽ രാത്രി 8:00 (20:00) വരെ
     for (let h = 9; h < 20; h++) {
         for (let m = 0; m < 60; m += 30) {
             const timeStr = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
@@ -103,13 +118,14 @@ function generateSlots() {
             btn.textContent = timeStr;
 
             if (!isFree) {
-                btn.title = "Busy";
+                btn.title = "Already Booked";
             } else {
                 btn.onclick = () => {
                     document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
                     btn.classList.add('selected');
                     selectedTime = timeStr;
                     document.getElementById('confirm-section').classList.remove('hidden');
+                    document.getElementById('confirm-section').scrollIntoView({behavior: "smooth"});
                 };
             }
             container.appendChild(btn);
@@ -117,27 +133,22 @@ function generateSlots() {
     }
 }
 
+// ബുക്കിംഗ് കൂട്ടിമുട്ടുന്നുണ്ടോ എന്ന് പരിശോധിക്കുന്നു
 function checkAvailability(newTimeStr, newDuration, existingBookings) {
-    // എല്ലാ സമയവും മിനിറ്റിലേക്ക് മാറ്റുന്നു (09:00 -> 540)
     const newStart = timeToMin(newTimeStr);
-    const newEnd = newStart + Number(newDuration); // പുതിയ ജോലിയുടെ അവസാന സമയം
+    const newEnd = newStart + Number(newDuration); 
 
     for (let booking of existingBookings) {
-        // പഴയ ബുക്കിംഗിന്റെ സമയം എടുക്കുന്നു
         const bookedStart = timeToMin(booking.time);
-        
-        // പഴയ ബുക്കിംഗിന്റെ Duration ഷീറ്റിൽ ഇല്ലെങ്കിൽ 30 മിനിറ്റ് എന്ന് കണക്കാക്കും
         const bookedDuration = booking.duration ? Number(booking.duration) : 30;
         const bookedEnd = bookedStart + bookedDuration;
 
-        // നിയമം: പുതിയ സമയം പഴയ സമയത്തിനുള്ളിൽ വരുന്നുണ്ടോ?
-        // (StartA < EndB) AND (EndA > StartB)
         if (newStart < bookedEnd && newEnd > bookedStart) {
-            return false; // കൂട്ടിമുട്ടുന്നു (തിരക്കാണ്)
+            return false; // കൂട്ടിമുട്ടുന്നു (Busy)
         }
     }
-    return true; // ഒഴിവുണ്ട്
-}
+    return true; // ഒഴിവുണ്ട് (Available)
+        }
 
 function timeToMin(t) {
     if(!t) return 0;
@@ -146,7 +157,7 @@ function timeToMin(t) {
 }
 
 // ---------------------------------------------------------
-// 🔥 FIX 2: WHATSAPP BUTTON LOGIC
+// ബുക്കിംഗ് സേവ് ചെയ്യുകയും വാട്സാപ്പിലേക്ക് അയക്കുകയും ചെയ്യുന്നു
 // ---------------------------------------------------------
 document.getElementById('saveBtn').addEventListener('click', async () => {
     const name = document.getElementById('customerName').value;
@@ -155,7 +166,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     if (!name) { alert("Please enter your name"); return; }
 
     const btn = document.getElementById('saveBtn');
-    btn.textContent = "Saving...";
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     btn.disabled = true;
 
     const bookingData = {
@@ -182,18 +194,18 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         document.getElementById('step-2').classList.add('hidden');
         document.getElementById('step-3').classList.add('hidden');
         document.getElementById('confirm-section').classList.add('hidden');
+        document.querySelector('header').style.display = 'none'; // ഹെഡർ മറയ്ക്കുന്നു
 
-        // 3. വാട്സാപ്പ് ബട്ടൺ സെറ്റ് ചെയ്യുന്നു (ഈ ലിങ്ക് നേരിട്ട് കസ്റ്റമർ ക്ലിക്ക് ചെയ്യണം)
-        const barberPhone = selectedBarber.phone; // ബാർബറുടെ ഫോൺ നമ്പർ ഷീറ്റിൽ നിന്ന്
+        // 3. വാട്സാപ്പ് ലിങ്ക് തയ്യാറാക്കുന്നു
+        const barberPhone = selectedBarber.phone; 
         
-        // ബാർബറുടെ പേര് കൂടി മെസ്സേജിൽ ചേർക്കുന്നു
-const msg = `*📅 New Appointment Request* %0A%0A` +
-            `💈 *Barber:* ${selectedBarber.name} %0A` +  // ബാർബറുടെ പേര്
-            `👤 *Customer:* ${name} %0A` +
-            `📞 *Phone:* ${phone} %0A` +
-            `✂️ *Service:* ${selectedService.name} %0A` +
-            `🗓️ *Date:* ${bookingData.date} %0A` +
-            `🕙 *Time:* ${bookingData.time}`;
+        const msg = `*📅 New Appointment Request* %0A%0A` +
+                    `💈 *Barber:* ${selectedBarber.name} %0A` +
+                    `👤 *Customer:* ${name} %0A` +
+                    `📞 *Phone:* ${phone} %0A` +
+                    `✂️ *Service:* ${selectedService.name} %0A` +
+                    `🗓️ *Date:* ${bookingData.date} %0A` +
+                    `🕙 *Time:* ${bookingData.time}`;
         
         const waLink = document.getElementById('waLink');
         waLink.href = `https://wa.me/${barberPhone}?text=${msg}`;
@@ -203,8 +215,8 @@ const msg = `*📅 New Appointment Request* %0A%0A` +
 
     } catch (error) {
         console.error(error);
-        alert("Error saving booking!");
+        alert("Error saving booking! Please try again.");
         btn.disabled = false;
-        btn.textContent = "Confirm Booking";
+        btn.innerHTML = originalText;
     }
 });

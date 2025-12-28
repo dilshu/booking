@@ -4,59 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salon Booking Pro</title>
+    
+    <!-- CSS ഫയൽ ലിങ്ക് ചെയ്യുന്നു -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- ഗ്ലോബൽ മെനു സ്ക്രിപ്റ്റ് -->
+    <script src="https://dilshu.github.io/g-menu/global-menu.js" defer></script>
+    
+    <!-- ഐക്കണുകൾ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- ഫോണ്ടുകൾ -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="container">
+    <!-- HERO SECTION (പുതിയ ലാൻഡിംഗ് പേജ് ഡിസൈൻ) -->
+    <div class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>SMART SALON</h1>
+            <p>Premium Haircuts & Styling Services</p>
+            <button onclick="scrollToBooking()" class="book-now-btn">Book Appointment</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container" id="booking-section">
         <header>
-            <h1>✂️ Smart Salon</h1>
-            <p id="loading-text"><i class="fas fa-spinner fa-spin"></i> Loading Data...</p>
+            <div class="header-icon">
+                <i class="fas fa-cut"></i>
+            </div>
+            <h2>Book Your Slot</h2>
+            <p id="loading-text"><i class="fas fa-spinner fa-spin"></i> Loading Services...</p>
         </header>
 
         <div id="app-content" class="hidden">
             
             <!-- Step 1: Service -->
-            <div id="step-1" class="form-group">
-                <label>1. Select Service</label>
+            <div id="step-1" class="form-group fade-in">
+                <label><i class="fas fa-list"></i> 1. Select Service</label>
                 <select id="serviceSelect">
                     <option value="">Loading...</option>
                 </select>
             </div>
 
             <!-- Step 2: Barber -->
-            <div id="step-2" class="form-group hidden">
-                <label>2. Select Barber</label>
+            <div id="step-2" class="form-group hidden fade-in">
+                <label><i class="fas fa-user-tie"></i> 2. Select Barber</label>
                 <select id="barberSelect"></select>
             </div>
 
             <!-- Step 3: Date & Slots -->
-            <div id="step-3" class="form-group hidden">
-                <label>3. Select Date</label>
+            <div id="step-3" class="form-group hidden fade-in">
+                <label><i class="fas fa-calendar-alt"></i> 3. Select Date</label>
                 <input type="date" id="dateInput">
                 
-                <label>4. Available Slots</label>
+                <label style="margin-top: 20px;"><i class="fas fa-clock"></i> 4. Available Slots</label>
                 <div id="slotsGrid" class="slots-container"></div>
-                <p class="note"><span class="dot busy"></span> Busy/Overlap <span class="dot free"></span> Available</p>
+                <p class="note">
+                    <span class="dot busy"></span> Busy 
+                    <span class="dot free" style="margin-left: 10px;"></span> Available
+                </p>
             </div>
 
             <!-- Step 4: Details Form -->
-            <div id="confirm-section" class="hidden">
-                <label>5. Enter Details</label>
+            <div id="confirm-section" class="hidden fade-in">
+                <label><i class="fas fa-info-circle"></i> 5. Enter Details</label>
                 <input type="text" id="customerName" placeholder="Your Name">
-                <input type="tel" id="customerPhone" placeholder="WhatsApp Number (e.g. 9198xxxxxx)">
+                <input type="tel" id="customerPhone" placeholder="WhatsApp Number (e.g. 97155xxxxxx)">
                 
                 <button id="saveBtn" class="primary-btn">
-                    Confirm Booking
+                    Confirm Booking <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
 
-            <!-- Step 5: Success & WhatsApp (New Section) -->
-            <div id="success-section" class="hidden success-box">
-                <i class="fas fa-check-circle" style="font-size: 50px; color: #2ecc71;"></i>
+            <!-- Step 5: Success & WhatsApp -->
+            <div id="success-section" class="hidden success-box fade-in">
+                <i class="fas fa-check-circle success-icon"></i>
                 <h3>Booking Saved!</h3>
-                <p>Please click below to send the details to the barber via WhatsApp.</p>
+                <p style="color: #aaa;">Your appointment is tentatively booked.</p>
+                <p class="wa-instruction">Click below to send details via WhatsApp to confirm.</p>
                 
                 <a id="waLink" href="#" target="_blank" class="whatsapp-btn">
                     <i class="fab fa-whatsapp"></i> Open WhatsApp
@@ -68,8 +96,14 @@
         </div>
     </div>
 
+    <!-- JavaScript ഫയൽ ലിങ്ക് ചെയ്യുന്നു -->
     <script src="script.js"></script>
+    
+    <script>
+        // സ്ക്രോൾ ചെയ്യാനുള്ള ഫംഗ്ഷൻ
+        function scrollToBooking() {
+            document.getElementById('booking-section').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
 </body>
 </html>
-
-
